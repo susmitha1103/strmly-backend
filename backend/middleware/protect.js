@@ -2,15 +2,15 @@ const jwt = require('jsonwebtoken');
 const USER = require('../models/users')
 
 const signToken = (userId) =>{
-  jwt.sign({
+  return jwt.sign({
     id: userId
   },process.env.JWT_SECRET,{
     expiresIn: "1h"
   })
 };
 
-const verifyToken = async(req,res,next) =>{
-
+const verifyToken = (req,res,next) =>{
+ 
   const token = req.headers.authorization?.split(' ')[1];
 
   if(!token){
@@ -19,7 +19,7 @@ const verifyToken = async(req,res,next) =>{
 
   try{
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await USER.findById(decoded.id).select('-password');
+    req.user = { id: decoded.id };
     next();
   }
   catch(error){
@@ -30,4 +30,4 @@ const verifyToken = async(req,res,next) =>{
 
 
 
-module.exports = signToken, verifyToken;
+module.exports = {signToken, verifyToken};
