@@ -1,5 +1,9 @@
+const users = require('../models/users');
 const USER = require('../models/users');
 const bcrypt = require('bcrypt');
+const signToken = require('../middleware/protect');
+
+
 
 const signupUser = async(req,res) =>{
   const {username, email, password} = req.body;
@@ -38,7 +42,42 @@ const signupUser = async(req,res) =>{
     console.error("error signing up",error.message);
     res.status(500).json({message: "Internal server error"});
   }
+};
 
 
-}
-module.exports = signupUser;
+const userLogin = async(req,res) =>{
+  const{email, password} = req.body;
+
+  if(!email || !password){
+    console.log("first check");
+    return res.status(400).json({message: "fields  email, and password are required"});
+  }
+
+  try{
+    const existingUser = await users.findOne({email});
+
+    if (!existingUser){
+      return res.status(400).json({ message: "Incorrect email or password" });
+    }
+
+     const isMatch = await bcrypt.compare(password, existingUser.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Incorrect email or password" });
+    }
+    const token = signToken(existingUser._id);
+
+    res.status(200).json({
+      message: `${existingUser.username} logged in successfully`,
+      token
+    });
+  }
+    catch(error){
+      console.error("Error logging in",error.message);
+      res.status(500).json({message: "Internal server error"});
+    }
+  };
+
+  
+
+module.exports = {signupUser,userLogin};
