@@ -81,8 +81,7 @@ const userLogin = async(req,res) =>{
   const getProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    console.log("userid",userId);
-    const userInfo = await USER.findById(userId).lean();
+    const userInfo = await USER.findById(userId);
 
     if (!userInfo) {
       return res.status(404).json({ message: "User not found" });

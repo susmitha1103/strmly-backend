@@ -1,14 +1,17 @@
 const express = require("express");
 const connectDB = require('./config/db')
+const helmet = require('helmet');
 const dotenv = require("dotenv");
 const userRoutes = require('./routes/userRoutes');
 const videoRoutes = require('./routes/videoRoutes');
+const rateLimiter = require('./middleware/rateLimit')
 
 dotenv.config({path: '../.env'});
 connectDB();
 
 
 const app = express();
+app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -18,6 +21,8 @@ app.use((req, res, next) => {
   });
   next();
 });
+
+app.use(rateLimiter);
 
 
 app.use('/users',userRoutes)
