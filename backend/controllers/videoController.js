@@ -39,6 +39,21 @@ const uploadVideo = async(req,res) =>{
     res.status(500).json({message: "Internal server error"});
 
   }
+};
+
+const getAllVideos = async(req,res) =>{
+  try{
+    const videos = await Video.find()
+      .select('title videoUrl createdAt uploadedBy')
+      .populate('uploadedBy', 'username _id')
+      .sort({ createdAt: -1 });
+
+      return res.status(200).json({ message: "Fetched all videos", videos });
+  }
+  catch(error){
+    console.error("error fetching videos",error.message);
+    return res.status(500).json({message:"internal server error"});
+  }
 
 }
-module.exports = {uploadVideo};
+module.exports = {uploadVideo,getAllVideos};

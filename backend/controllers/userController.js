@@ -79,7 +79,6 @@ const userLogin = async(req,res) =>{
   };
   
   const getProfile = async (req, res) => {
-    console.log("getProfile route reached");
   try {
     const userId = req.user.id;
     console.log("userid",userId);
