@@ -1,7 +1,6 @@
-const users = require('../models/users');
 const USER = require('../models/users');
 const bcrypt = require('bcrypt');
-const signToken = require('../middleware/protect');
+const {signToken} = require('../middleware/protect');
 
 
 
@@ -54,7 +53,7 @@ const userLogin = async(req,res) =>{
   }
 
   try{
-    const existingUser = await users.findOne({email});
+    const existingUser = await USER.findOne({email});
 
     if (!existingUser){
       return res.status(400).json({ message: "Incorrect email or password" });
@@ -65,7 +64,7 @@ const userLogin = async(req,res) =>{
     if (!isMatch) {
       return res.status(400).json({ message: "Incorrect email or password" });
     }
-    const token = signToken(existingUser._id.toString());
+    const token = signToken(existingUser._id);
     
 
     res.status(200).json({

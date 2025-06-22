@@ -2,6 +2,7 @@ const express = require("express");
 const connectDB = require('./config/db')
 const dotenv = require("dotenv");
 const userRoutes = require('./routes/userRoutes');
+const videoRoutes = require('./routes/videoRoutes');
 
 dotenv.config({path: '../.env'});
 connectDB();
@@ -9,8 +10,18 @@ connectDB();
 
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use((req, res, next) => {
+  res.setTimeout(20000, () => { 
+    return res.status(408).json({ message: 'Request timed out' });
+  });
+  next();
+});
+
 
 app.use('/users',userRoutes)
+app.use('/videos',videoRoutes);
 
 
 const Port = process.env.PORT;
