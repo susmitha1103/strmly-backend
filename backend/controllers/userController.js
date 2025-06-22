@@ -65,11 +65,12 @@ const userLogin = async(req,res) =>{
     if (!isMatch) {
       return res.status(400).json({ message: "Incorrect email or password" });
     }
-    const token = signToken(existingUser._id);
+    const token = signToken(existingUser._id.toString());
+    
 
     res.status(200).json({
       message: `${existingUser.username} logged in successfully`,
-      token
+      token:`${token}`
     });
   }
     catch(error){
@@ -77,7 +78,33 @@ const userLogin = async(req,res) =>{
       res.status(500).json({message: "Internal server error"});
     }
   };
+  
+  const getProfile = async (req, res) => {
+    console.log("getProfile route reached");
+  try {
+    const userId = req.user.id;
+    console.log("userid",userId);
+    const userInfo = await USER.findById(userId).lean();
+
+    if (!userInfo) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "User details fetched",
+      user: {
+        id: userInfo._id,
+        username: userInfo.username,
+        email: userInfo.email
+      }
+    });
+
+  } catch (error) {
+    console.error("Error fetching user information:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
   
 
-module.exports = {signupUser,userLogin};
+module.exports = {signupUser,userLogin,getProfile};
